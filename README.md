@@ -1,2 +1,2 @@
-# game-theory
-Simulation of a game theory minority game
+# Minority Game Simulation
+This is a simulation of a minority game, from the field of game theory.
