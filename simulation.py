@@ -39,10 +39,16 @@ class Simulation:
             self.save()  # Automatically save the data after simulation.
 
     def save(self):
+        #if the /saves directory does not exist, create it
+        if not os.path.exists("saves"):
+            os.makedirs("saves")
         with open(self.file_name, 'wb') as file:
             pickle.dump(self, file)
 
     def load(self):
+        #if the /saves directory does not exist, create it
+        if not os.path.exists("saves"):
+            os.makedirs("saves")
         with open(self.file_name, 'rb') as file:
             data = pickle.load(file)
             self.__dict__.update(data.__dict__)
