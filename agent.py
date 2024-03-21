@@ -3,10 +3,13 @@ from sklearn.tree import DecisionTreeClassifier
 import numpy as np
 
 class Agent:
-    def __init__(self, memory_size, explorationRounds, minority_threshold):
+    def __init__(self, memory_size, explorationRounds, minority_threshold, inductive):
         self.explorationRounds = explorationRounds
         self.memory_size = memory_size
-        self.strategy_types = ['random', 'weighted_random', 'genetic', 'bayesian', 'adaptive', 'market_based', 'pattern_recognition','repeat_last','inverse_last']
+        if inductive:
+            self.strategy_types = ['weighted_random', 'genetic', 'bayesian', 'adaptive', 'market_based', 'pattern_recognition','repeat_last','inverse_last']
+        else:
+            self.strategy_types = ['weighted_random']
         self.current_strategy = np.random.choice(self.strategy_types)
         self.strategy_scores = {strategy: 0 for strategy in self.strategy_types}
         self.pattern_memory = []
@@ -30,6 +33,34 @@ class Agent:
         self.wonLastRound = None
         self.choices=[]
 
+    def serialize(self):
+        return {
+            'explorationRounds': self.explorationRounds,
+            'memory_size': self.memory_size,
+            'strategy_types': self.strategy_types,
+            'current_strategy': self.current_strategy,
+            'strategy_scores': self.strategy_scores,
+            'pattern_memory': self.pattern_memory,
+            'bayesian_params': self.bayesian_params,
+            'adaptive_memory': self.adaptive_memory,
+            'model_trained': self.model_trained,
+            'history_index_cache': self.history_index_cache,
+            'decisionHistory': self.decisionHistory,
+            'learning_rate': self.learning_rate,
+            'decision_prices': self.decision_prices.tolist(), # NumPy array converted to list
+            'genetic_strategies': self.genetic_strategies.tolist(), # NumPy array converted to list
+            'genetic_performance': self.genetic_performance.tolist(), # NumPy array converted to list
+            'temperature': self.temperature,
+            'last_strategy_change': self.last_strategy_change,
+            'strategy_failure_count': self.strategy_failure_count,
+            'strategy_rewards': self.strategy_rewards,
+            'particle_position': self.particle_position.tolist(), # NumPy array converted to list
+            'particle_velocity': self.particle_velocity.tolist(), # NumPy array converted to list
+            'personal_best_position': self.personal_best_position.tolist(), # NumPy array converted to list
+            'minority_threshold': self.minority_threshold,
+            'wonLastRound': self.wonLastRound,
+            'choices': self.choices
+        }
 
     def decide(self, history):
         self.select_strategy()
@@ -58,7 +89,7 @@ class Agent:
         return choice
 
     def _weighted_random_decide(self):
-        return int(np.random.rand() < self.minority_threshold)
+        return int(np.random.rand() > self.minority_threshold)
 
     def _repeat_last_decide(self):
         if self.wonLastRound == None:

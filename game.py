@@ -6,16 +6,16 @@ import concurrent.futures
 
 
 class MinorityGame:
-    def __init__(self, num_agents, memory_size, num_rounds, explorationRounds, minority_threshold):
+    def __init__(self, num_agents, memory_size, num_rounds, explorationRounds, minority_threshold, inductive):
         self.num_agents = num_agents
-        self.agents = [Agent(memory_size, explorationRounds=explorationRounds, minority_threshold=minority_threshold) for _ in range(num_agents)]
+        self.agents = [Agent(memory_size, explorationRounds, minority_threshold, inductive) for _ in range(num_agents)]
         self.num_rounds = num_rounds
         self.memory_size = memory_size
         self.history = np.random.choice([0, 1], size=memory_size).tolist()
         self.strategy_decision_counts = {strategy: [] for strategy in self.agents[0].strategy_types}
         self.strategy_counts_per_round = {strategy: [] for strategy in self.agents[0].strategy_types}
         self.minority_threshold = minority_threshold
-        
+
     def play_round(self):
         with concurrent.futures.ThreadPoolExecutor() as executor:
             decisions = list(executor.map(lambda agent: agent.decide(self.history), self.agents))
